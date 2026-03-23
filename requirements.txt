@@ -8,3 +8,6 @@ pandas
 numpy
 joblib
 xgboost
+mlflow
+evidently
+schedule
