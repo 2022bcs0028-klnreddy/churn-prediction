@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   churn-api:
-    build: .
+    image: scarxlynx/churn-risk-api:latest
     container_name: churn-risk-api
     ports:
       - "8000:8000"
