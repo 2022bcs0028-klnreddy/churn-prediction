@@ -9,3 +9,7 @@ build/
 .pytest_cache/
 *.pkl
 .DS_Store
+
+mlruns/
+mlops/drift/reports/
+ml/models/
