@@ -5,12 +5,11 @@ pipeline {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
         MODEL_DIR           = 'models'
         PYTHONPATH          = '.'
+        VENV                = 'venv/bin'
     }
 
     triggers {
-        // CT: automatic retraining every Sunday at 2am
         cron('0 2 * * 0')
-        // CI: trigger on GitHub push (requires GitHub webhook)
         githubPush()
     }
 
@@ -26,7 +25,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    pip install -r requirements.txt --quiet
+                    python3 -m venv venv
+                    venv/bin/pip install --upgrade pip --quiet
+                    venv/bin/pip install -r requirements.txt --quiet
                 '''
             }
         }
@@ -34,7 +35,7 @@ pipeline {
         stage('DVC Pull') {
             steps {
                 sh '''
-                    dvc pull || echo "No DVC remote configured, skipping pull"
+                    venv/bin/dvc pull || echo "No DVC remote configured, skipping pull"
                 '''
             }
         }
@@ -42,7 +43,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                    python -m pytest tests/ -v --tb=short || true
+                    venv/bin/python -m pytest tests/ -v --tb=short || true
                 '''
             }
         }
@@ -50,7 +51,7 @@ pipeline {
         stage('Check Data Drift') {
             steps {
                 sh '''
-                    python -c "
+                    venv/bin/python -c "
 from mlops.drift.drift_detection import check_drift
 import sys
 drift = check_drift()
@@ -63,7 +64,7 @@ print(f'Drift detected: {drift}')
         stage('Train Model') {
             steps {
                 sh '''
-                    python -m ml.train
+                    venv/bin/python -m ml.train
                 '''
             }
         }
@@ -71,7 +72,7 @@ print(f'Drift detected: {drift}')
         stage('Evaluate & Gate') {
             steps {
                 sh '''
-                    python -c "
+                    venv/bin/python -c "
 import json, sys
 with open('metrics.json') as f:
     m = json.load(f)
@@ -102,7 +103,7 @@ print('Model passed quality gate')
                     git add metrics.json || true
                     git commit -m "CI: update metrics [skip ci]" || true
                     git push origin main || true
-                    dvc push || true
+                    venv/bin/dvc push || true
                 '''
             }
         }
