@@ -13,3 +13,4 @@ build/
 mlruns/
 mlops/drift/reports/
 ml/models/
+.dvc-env/

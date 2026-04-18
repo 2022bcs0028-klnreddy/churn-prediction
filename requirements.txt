@@ -24,3 +24,5 @@ httpx
 
 # API docs / utilities
 python-multipart
+
+prometheus-fastapi-instrumentator

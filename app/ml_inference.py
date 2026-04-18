@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from prometheus_fastapi_instrumentator import Instrumentator
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml.feature_engineering import build_feature_matrix, FEATURE_COLUMNS
@@ -33,7 +34,7 @@ app = FastAPI(
     description="ML-based customer churn risk scoring — replaces rule engine",
     version="2.0.0",
 )
-
+Instrumentator().instrument(app).expose(app)
 # ──────────────────────────────────────────────
 # Model loader (singleton)
 # ──────────────────────────────────────────────

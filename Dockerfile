@@ -13,7 +13,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ml/ ./ml/
-COPY data/ ./data/
+COPY ml/data/ ./ml/data/
+COPY mlops/ ./mlops/
 
 # Train the model; artifact lands in /app/models/
 RUN python ml/train.py \
