@@ -115,8 +115,11 @@ print('Model passed quality gate')
         stage('Build & Deploy Docker') {
             steps {
                 sh '''
-                    docker-compose build ml-api
-                    docker-compose up -d ml-api
+                    # Copy updated model to the shared volume
+                    cp models/churn_model.pkl /var/jenkins_home/workspace/churn-prediction/models/ || true
+
+                    # Restart the ml-api container to pick up new model
+                    docker restart churn-ml-api || echo "Could not restart container — skipping"
                 '''
             }
         }
