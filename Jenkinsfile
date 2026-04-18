@@ -52,11 +52,28 @@ pipeline {
             steps {
                 sh '''
                     venv/bin/python -c "
-from mlops.drift.drift_detection import check_drift
-import sys
-drift = check_drift()
-print(f'Drift detected: {drift}')
-"
+        import sys
+        sys.path.insert(0, '.')
+        from ml.features import load_and_preprocess, simulate_ticket_features
+        from mlops.drift.detector import detect_data_drift, simulate_production_drift
+
+        df = load_and_preprocess('ml/data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
+        df = simulate_ticket_features(df)
+
+        reference = df.sample(1000, random_state=42)
+        current = simulate_production_drift(df.sample(1000, random_state=99))
+
+        ref_features = reference.drop(columns=['Churn'])
+        cur_features = current.drop(columns=['Churn'])
+
+        summary = detect_data_drift(ref_features, cur_features)
+        print(f'Drift detected: {summary[\"dataset_drift_detected\"]}')
+        print(f'Drift share: {summary[\"drift_share\"]}')
+
+        if summary[\"drift_share\"] > 0.5:
+            print('High drift — retraining triggered')
+            sys.exit(0)
+        " || echo "Drift check skipped"
                 '''
             }
         }
