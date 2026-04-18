@@ -25,6 +25,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
+                    apt-get update -qq
+                    apt-get install -y -qq python3-venv python3-full
                     python3 -m venv venv
                     venv/bin/pip install --upgrade pip --quiet
                     venv/bin/pip install -r requirements.txt --quiet
