@@ -235,6 +235,17 @@ def train(
         for k, v in metrics.items():
             mlflow.log_metric(k, v)
 
+        # Save metrics.json for Jenkins quality gate
+        with open("metrics.json", "w") as mf:
+            json.dump({
+                "f1": float(metrics["f1"]),
+                "roc_auc": float(metrics["roc_auc"]),
+                "avg_precision": float(metrics["avg_precision"]),
+                "precision": float(metrics["precision"]),
+                "recall": float(metrics["recall"]),
+            }, mf, indent=2)
+        logger.info("metrics.json saved")
+
         logger.info("Test metrics: %s", metrics)
         logger.info("\n%s", report)
 
@@ -286,5 +297,6 @@ if __name__ == "__main__":
         experiment_name=args.experiment,
         model_name=args.model,
     )
+    
     print(f"\n✅ Training complete. Model at: {model_path}")
     print(f"   F1={metrics['f1']:.4f}  ROC-AUC={metrics['roc_auc']:.4f}  AP={metrics['avg_precision']:.4f}")

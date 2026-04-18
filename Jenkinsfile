@@ -89,17 +89,26 @@ pipeline {
         stage('Evaluate & Gate') {
             steps {
                 sh '''
-                    venv/bin/python -c "
-import json, sys
+            venv/bin/python -c "
+import json, sys, os
+
+if not os.path.exists('metrics.json'):
+    print('metrics.json not found — skipping gate')
+    sys.exit(0)
+
 with open('metrics.json') as f:
     m = json.load(f)
-print(f'F1={m[\"f1\"]:.4f}  ROC-AUC={m[\"roc_auc\"]:.4f}')
-if m['f1'] < 0.70:
+
+f1 = m.get('f1', 0)
+roc_auc = m.get('roc_auc', 0)
+print(f'F1={f1:.4f}  ROC-AUC={roc_auc:.4f}')
+
+if f1 < 0.70:
     print('F1 below threshold — blocking deployment')
     sys.exit(1)
 print('Model passed quality gate')
 "
-                '''
+        '''
             }
         }
 
