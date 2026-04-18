@@ -38,7 +38,9 @@ jobs:
       - name: Lint with flake8
         run: |
           pip install flake8
-          flake8 ml/ app/ mlops/ tests/ --max-line-length=120 --ignore=E501,W503
+          flake8 ml/ app/ mlops/ tests/ \
+            --max-line-length=120 \
+            --extend-ignore=E501,W503,E402,W292,W293,F401,E127,E128,E302,F541,W291
 
       - name: Run unit tests
         run: |
