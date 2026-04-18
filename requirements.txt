@@ -1,13 +1,26 @@
+# Web framework
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
-pytest
-httpx
+
+# ML core
 scikit-learn
-pandas
-numpy
-joblib
 xgboost
+numpy
+pandas
+joblib
+scipy
+
+# MLOps
 mlflow
+dvc
 evidently
 schedule
+
+# Testing
+pytest
+pytest-asyncio
+httpx
+
+# API docs / utilities
+python-multipart
